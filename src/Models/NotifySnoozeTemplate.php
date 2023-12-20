@@ -1,6 +1,6 @@
 <?php
 
-namespace nhattuanbl\Snooze\Models;
+namespace Nhattuanbl\Snooze\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

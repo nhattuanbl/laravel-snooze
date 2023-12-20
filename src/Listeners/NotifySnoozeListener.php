@@ -1,11 +1,11 @@
 <?php
 
-namespace nhattuanbl\Snooze\Listeners;
+namespace Nhattuanbl\Snooze\Listeners;
 
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Notification;
-use nhattuanbl\Snooze\Models\NotifySnoozeRecipient;
-use nhattuanbl\Snooze\Notifications\INotifySnooze;
+use Nhattuanbl\Snooze\Models\NotifySnoozeRecipient;
+use Nhattuanbl\Snooze\Notifications\INotifySnooze;
 
 class NotifySnoozeListener
 {
@@ -21,18 +21,20 @@ class NotifySnoozeListener
         $user = $event->notifiable;
         $channel = $event->channel;
         $response = $event->response;
+        $snooze = $notification->snooze;
+        $type = $snooze->template ? $snooze->template->type : $snooze->event;
 
         $recipient = NotifySnoozeRecipient::create([
             'channel' => $channel,
-            'content' => $notification->content,
+            'type' => $type,
+            'overlap' => $snooze->overlap,
             'seen_at' => null,
-            'payload' => $notification->payload,
+            'payload' => $notification->payload ?? null,
             'user_id' => $user->id,
             'notify_snooze_id' => $notification->snooze->id,
+            'content' => $notification->content ?? null,
         ]);
 
-        if (method_exists($notification, 'after')) {
-            $notification->after($recipient, $response);
-        }
+        $notification->after($recipient, $response);
     }
 }

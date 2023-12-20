@@ -1,10 +1,10 @@
 <?php
 
-namespace nhattuanbl\Snooze\Notifications;
+namespace Nhattuanbl\Snooze;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Notifications\Events\NotificationSent;
-use nhattuanbl\Snooze\Listeners\NotifySnoozeListener;
+use Nhattuanbl\Snooze\Listeners\NotifySnoozeListener;
 
 class EventServiceProvider extends ServiceProvider
 {

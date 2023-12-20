@@ -1,6 +1,6 @@
 <?php
 
-namespace nhattuanbl\Snooze\Facades;
+namespace Nhattuanbl\Snooze\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

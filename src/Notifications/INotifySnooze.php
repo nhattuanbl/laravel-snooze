@@ -1,17 +1,17 @@
 <?php
 
-namespace nhattuanbl\Snooze\Notifications;
+namespace Nhattuanbl\Snooze\Notifications;
 
-use nhattuanbl\Snooze\Models\NotifySnooze;
-use nhattuanbl\Snooze\Models\NotifySnoozeRecipient;
+use Nhattuanbl\Snooze\Models\NotifySnooze;
+use Nhattuanbl\Snooze\Models\NotifySnoozeRecipient;
 
 /**
  * @property NotifySnooze snooze
  * @property array payload
  * @property string content
- * @method after(NotifySnoozeRecipient $recipient, $response)
  */
 interface INotifySnooze
 {
-
+    public function __construct(NotifySnooze $snooze);
+    public function after(NotifySnoozeRecipient $recipient, $response);
 }

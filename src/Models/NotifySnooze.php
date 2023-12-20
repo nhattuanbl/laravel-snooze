@@ -1,9 +1,10 @@
 <?php
 
-namespace nhattuanbl\Snooze\Models;
+namespace Nhattuanbl\Snooze\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
 /**
  * @property int notify_snooze_template_id
@@ -11,7 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class NotifySnooze extends Model
 {
-    use HasFactory;
+    use HasFactory, Cachable;
+
     protected $dates = [
         'sent_at',
         'created_at',
@@ -19,18 +21,22 @@ class NotifySnooze extends Model
         'snooze_until'
     ];
     protected $fillable = [
+        'channels',
         'content',
-        'unique_key',
         'event',
+        'overlap',
         'snooze_until',
         'sent_at',
         'receiver',
         'notify_snooze_template_id'
     ];
     protected $casts = [
+        'channels' => 'array',
         'receiver' => 'array',
         'sent_at' => 'datetime:Y-m-d H:i:s',
         'snooze_until' => 'datetime:Y-m-d H:i:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function template()

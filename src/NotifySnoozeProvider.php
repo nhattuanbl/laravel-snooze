@@ -1,10 +1,11 @@
 <?php
 
-namespace nhattuanbl\Snooze;
+namespace Nhattuanbl\Snooze;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
-use nhattuanbl\Snooze\Console\Commands\NotifySnoozeCommand;
+use Nhattuanbl\Snooze\Console\Commands\NotifySnoozeCommand;
+use Nhattuanbl\Snooze\Services\NotifySnoozeService;
 
 class NotifySnoozeProvider extends ServiceProvider
 {
@@ -13,9 +14,10 @@ class NotifySnoozeProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/snooze.php', 'snooze');
 
         $this->app->bind('NotifySnooze', function () {
-            return new \NotifySnoozeService();
+            return new NotifySnoozeService();
         });
 
+        $this->app->register(EventServiceProvider::class);
     }
 
     public function boot(): void
@@ -27,6 +29,7 @@ class NotifySnoozeProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../database/migrations/' => database_path('migrations'),
         ], 'migration');
+
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         $this->commands([NotifySnoozeCommand::class]);

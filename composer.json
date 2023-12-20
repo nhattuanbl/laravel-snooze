@@ -1,10 +1,12 @@
 {
-    "name": "nhattuanbl/snooze",
+    "name": "Nhattuanbl/Snooze",
     "description": "Avoid laravel notification spamming",
-    "version": "0.1",
+    "version": "0.4",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Nhattuanbl\\Snooze\\": "src/"
+            "Nhattuanbl\\Snooze\\": "src/",
+            "Nhattuanbl\\Snooze\\Database\\\\Factories\\\\": "database/factories"
         }
     },
     "authors": [
@@ -14,5 +16,17 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "genealabs/laravel-model-caching": "^0.10.2"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nhattuanbl\\Snooze\\NotifySnoozeProvider"
+            ],
+            "aliases": [
+
+            ]
+        }
+    }
 }
