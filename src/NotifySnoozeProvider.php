@@ -3,8 +3,10 @@
 namespace Nhattuanbl\Snooze;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 use Nhattuanbl\Snooze\Console\Commands\NotifySnoozeCommand;
+use Nhattuanbl\Snooze\Facades\Snooze;
 use Nhattuanbl\Snooze\Services\NotifySnoozeService;
 
 class NotifySnoozeProvider extends ServiceProvider
@@ -18,6 +20,8 @@ class NotifySnoozeProvider extends ServiceProvider
         });
 
         $this->app->register(EventServiceProvider::class);
+        $loader = AliasLoader::getInstance();
+        $loader->alias('Snooze', Snooze::class);
     }
 
     public function boot(): void

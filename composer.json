@@ -1,7 +1,7 @@
 {
     "name": "nhattuanbl/snooze",
     "description": "Avoid laravel notification spamming",
-    "version": "0.5",
+    "version": "0.6",
     "license": "MIT",
     "autoload": {
         "psr-4": {
@@ -16,17 +16,15 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {
-        "genealabs/laravel-model-caching": "^0.10.2"
-    },
+    "require": {},
     "extra": {
         "laravel": {
             "providers": [
                 "Nhattuanbl\\Snooze\\NotifySnoozeProvider"
             ],
-            "aliases": [
-
-            ]
+            "aliases": {
+                "Snooze": "Nhattuanbl\\Snooze\\Facades\\Snooze"
+            }
         }
     }
 }

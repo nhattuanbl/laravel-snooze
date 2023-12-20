@@ -4,7 +4,6 @@ namespace Nhattuanbl\Snooze\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
 /**
  * @property int notify_snooze_template_id
@@ -12,7 +11,7 @@ use GeneaLabs\LaravelModelCaching\Traits\Cachable;
  */
 class NotifySnooze extends Model
 {
-    use HasFactory, Cachable;
+    use HasFactory;
 
     protected $dates = [
         'sent_at',
