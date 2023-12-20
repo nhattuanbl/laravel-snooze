@@ -14,6 +14,7 @@ class NotifySnoozeProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/snooze.php', 'snooze');
+        $this->mergeConfigFrom(__DIR__.'/../config/logging.php', 'logging.channels');
 
         $this->app->bind('NotifySnooze', function () {
             return new NotifySnoozeService();

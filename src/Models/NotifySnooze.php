@@ -2,12 +2,23 @@
 
 namespace Nhattuanbl\Snooze\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int notify_snooze_template_id
+ * @property array<string> channels
  * @property string content
+ * @property string event
+ * @property string overlap
+ * @property Carbon snooze_until
+ * @property Carbon sent_at
+ * @property array<int> receiver
+ * @property Carbon created_at
+ * @property Carbon updated_at
+ * @property int notify_snooze_template_id
+ * @property NotifySnoozeTemplate template
+ * @property NotifySnoozeRecipient recipients
  */
 class NotifySnooze extends Model
 {

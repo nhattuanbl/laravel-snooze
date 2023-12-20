@@ -30,8 +30,8 @@ class CreateNotifySnoozeRecipientsTable extends Migration
 
         if (config('snooze.no_sql', false)) {
             Schema::connection(config('snooze.connection'))->table('notify_snooze_recipients', function (Blueprint $table) {
-                $table->foreign('notify_snooze_id')->references('id')->on('notify_snoozes')->onDelete('cascade');
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('notify_snooze_id')->references('id')->on('notify_snoozes')->nullOnDelete();
+                $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             });
         }
     }

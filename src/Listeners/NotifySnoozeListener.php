@@ -13,7 +13,6 @@ class NotifySnoozeListener
     {
         /** @var Notification $notification */
         $notification = $event->notification;
-
         if (!$notification instanceof INotifySnooze) {
             return;
         }

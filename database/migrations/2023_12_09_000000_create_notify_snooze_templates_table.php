@@ -10,10 +10,9 @@ class CreateNotifySnoozeTemplatesTable extends Migration
     {
         Schema::connection(config('snooze.connection'))->create('notify_snooze_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('type', 30);
+            $table->string('type', 30)->unique();
             $table->json('channels');
             $table->string('context', 1000);
-            $table->boolean('is_hidden')->default(false); //hidden in user notification center
             $table->integer('min_snooze_daytime')->default(1); //in minutes
             $table->integer('max_snooze_daytime')->default(5); //in minutes
             $table->integer('min_snooze_nighttime')->default(-1); //-1 wait for morning

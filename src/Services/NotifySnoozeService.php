@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Nhattuanbl\Snooze\Models\NotifySnooze;
 use Nhattuanbl\Snooze\Models\NotifySnoozeTemplate;
 
@@ -20,10 +21,10 @@ class NotifySnoozeService
      * @param NotifySnoozeTemplate|string $template content or plan to send
      * @param array<int>|int $receiver user_ids
      * @param array<Notification> $channels
-     * @param int $until in minutes
+     * @param int|float $until in minutes
      * @return NotifySnooze
      */
-    public function send($overlap, string $event, $template, $receiver, array $channels = [], int $until = 1): NotifySnooze
+    public function send($overlap, string $event, $template, $receiver, array $channels = [], $until = 0.1): NotifySnooze
     {
         if ($overlap instanceof Model) {
             $overlap = get_class($overlap) . ':' . $overlap->id;
@@ -31,7 +32,7 @@ class NotifySnoozeService
             $overlap = implode(':', $overlap);
         }
 
-        $snooze = NotifySnooze::where('overlap', $overlap)->whereNull('send_at')->where('event', $event)->first();
+        $snooze = NotifySnooze::where('overlap', $overlap)->whereNull('sent_at')->where('event', $event)->first();
         if ($snooze) {
             $snooze->updated_at = now();
 
@@ -116,5 +117,16 @@ class NotifySnoozeService
     private static function isNightTime(): bool
     {
         return now()->gte(Carbon::createFromTimeString(self::START_NIGHT_TIME)) || now()->lte(Carbon::createFromTimeString(self::END_NIGHT_TIME));
+    }
+
+    public static function debug(string $message, array $context = [])
+    {
+        $logChannels = config('logging.channels');
+        if (config('snooze.debug', false)) {
+            Log::channel('stderr')->debug($message, $context);
+            if (array_key_exists('notify_snooze', $logChannels)) {
+                Log::channel('notify_snooze')->debug($message, $context);
+            }
+        }
     }
 }

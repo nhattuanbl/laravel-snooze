@@ -2,10 +2,10 @@
 
 namespace Nhattuanbl\Snooze\Console\Commands;
 
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Notifications\Notification;
 use Nhattuanbl\Snooze\Models\NotifySnooze;
+use Nhattuanbl\Snooze\Services\NotifySnoozeService;
 
 class NotifySnoozeCommand extends Command
 {
@@ -27,8 +27,10 @@ class NotifySnoozeCommand extends Command
         }
 
         $flag = null;
-        $query->chunk(100, function ($records) use ($id, &$flag) {
+        $query->chunk(100, function ($records) use (&$flag) {
             foreach ($records as $snooze) {
+                NotifySnoozeService::debug('[NotifySnooze] Sending #' . $snooze->id);
+
                 if ($snooze->notify_snooze_template_id) {
                     $channels = $snooze->template->channels;
                 } else {
@@ -37,19 +39,30 @@ class NotifySnoozeCommand extends Command
 
                 foreach ($channels as $channel) {
                     try {
-                        if (!class_exists($channel) || !($channel instanceof Notification)) {
+                        if (!class_exists($channel)) {
                             throw new \Exception('[NotifySnooze] Channel not found: ' . $channel . ' for #' . $snooze->id);
                         }
 
-                        $user = config('snooze.user_model');
-                        $receivers = $user::whereIn('id', $snooze->receiver)->get();
-                        foreach ($receivers as $receiver) {
-                            $notification = new $channel($snooze);
-                            if ($id) $notification->onConnection('sync');
-                            $receiver->notify($notification);
-                            $snooze->send_at = now();
-                            $snooze->save();
+                        $notification = new $channel($snooze);
+                        if (! $notification instanceof Notification) {
+                            throw new \Exception('[NotifySnooze] Bad Notification ' . $channel);
                         }
+
+                        $user = config('snooze.user_model');
+                        $user::whereIn('id', $snooze->receiver)->chunk(500, function ($users) use($notification, $snooze) {
+                            foreach ($users as $user) {
+                                if ($this->argument('id')) {
+                                    NotifySnoozeService::debug('[NotifySnooze] Notify now #'.$snooze->id.' on user #' . $user->id);
+                                    $user->notifyNow($notification);
+                                } else {
+                                    NotifySnoozeService::debug('[NotifySnooze] Notify #'.$snooze->id.' on user #' . $user->id);
+                                }
+
+                                $user->notify($notification);
+                                $snooze->sent_at = now();
+                                $snooze->save();
+                            }
+                        });
                     } catch (\Exception $e) {
                         $flag = $e;
                     }
@@ -57,6 +70,9 @@ class NotifySnoozeCommand extends Command
             }
         });
 
-        if ($flag) throw $flag;
+        if ($flag) {
+            NotifySnoozeService::debug('[NotifySnooze] ' . $flag->getMessage());
+            throw $flag;
+        }
     }
 }
