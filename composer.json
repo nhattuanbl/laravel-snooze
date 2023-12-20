@@ -1,7 +1,7 @@
 {
-    "name": "Nhattuanbl/Snooze",
+    "name": "nhattuanbl/snooze",
     "description": "Avoid laravel notification spamming",
-    "version": "0.4",
+    "version": "0.5",
     "license": "MIT",
     "autoload": {
         "psr-4": {
