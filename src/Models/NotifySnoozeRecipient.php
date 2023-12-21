@@ -53,6 +53,6 @@ class NotifySnoozeRecipient extends Model
 
     public function notify()
     {
-        return $this->belongsTo(NotifySnooze::class);
+        return $this->belongsTo(NotifySnooze::class, 'notify_snooze_id');
     }
 }

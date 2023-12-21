@@ -21,11 +21,10 @@ class NotifySnoozeListener
         $channel = $event->channel;
         $response = $event->response;
         $snooze = $notification->snooze;
-        $type = $snooze->template ? $snooze->template->type : $snooze->event;
 
         $recipient = NotifySnoozeRecipient::create([
             'channel' => $channel,
-            'type' => $type,
+            'type' => isset($snooze->template) ? $snooze->template->type : null,
             'overlap' => $snooze->overlap,
             'seen_at' => null,
             'payload' => $notification->payload ?? null,

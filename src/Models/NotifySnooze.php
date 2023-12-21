@@ -5,11 +5,11 @@ namespace Nhattuanbl\Snooze\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
  * @property array<string> channels
  * @property string content
- * @property string event
  * @property string overlap
  * @property Carbon snooze_until
  * @property Carbon sent_at
@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon updated_at
  * @property int notify_snooze_template_id
  * @property NotifySnoozeTemplate template
- * @property NotifySnoozeRecipient recipients
+ * @property Collection<NotifySnoozeRecipient> recipients
  */
 class NotifySnooze extends Model
 {
@@ -33,7 +33,6 @@ class NotifySnooze extends Model
     protected $fillable = [
         'channels',
         'content',
-        'event',
         'overlap',
         'snooze_until',
         'sent_at',
@@ -51,11 +50,11 @@ class NotifySnooze extends Model
 
     public function template()
     {
-        return $this->belongsTo(NotifySnoozeTemplate::class);
+        return $this->belongsTo(NotifySnoozeTemplate::class, 'notify_snooze_template_id');
     }
 
     public function recipients()
     {
-        return $this->hasMany(NotifySnoozeRecipient::class);
+        return $this->hasMany(NotifySnoozeRecipient::class, 'notify_snooze_id');
     }
 }

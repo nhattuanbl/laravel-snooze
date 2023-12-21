@@ -17,14 +17,13 @@ class NotifySnoozeService
 
     /**
      * @param Model|string|array $overlap
-     * @param string $event
      * @param NotifySnoozeTemplate|string $template content or plan to send
      * @param array<int>|int $receiver user_ids
      * @param array<Notification> $channels
      * @param int|float $until in minutes
      * @return NotifySnooze
      */
-    public function send($overlap, string $event, $template, $receiver, array $channels = [], $until = 0.1): NotifySnooze
+    public function send($overlap, $template, $receiver = [], array $channels = [], $until = 0.1): NotifySnooze
     {
         if ($overlap instanceof Model) {
             $overlap = get_class($overlap) . ':' . $overlap->id;
@@ -32,8 +31,13 @@ class NotifySnoozeService
             $overlap = implode(':', $overlap);
         }
 
-        $snooze = NotifySnooze::where('overlap', $overlap)->whereNull('sent_at')->where('event', $event)->first();
+        if (is_numeric($template)) {
+            $template = NotifySnoozeTemplate::findOrFail($template);
+        }
+
+        $snooze = NotifySnooze::where('overlap', $overlap)->whereNull('sent_at')->first();
         if ($snooze) {
+            NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Modify exist snooze');
             $snooze->updated_at = now();
 
             if (is_string($template)) {
@@ -42,6 +46,7 @@ class NotifySnoozeService
                 $max_minute = self::isNightTime() ? $template->max_snooze_nighttime : $template->max_snooze_daytime;
                 $created_at = $snooze->created_at;
                 if ($created_at->addMinutes($max_minute)->gt($snooze->snooze_until)) {
+                    NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze plus: ' . ((self::isNightTime() ? $template->min_snooze_nighttime : $template->min_snooze_daytime) ?? 1) . ' minutes');
                     $snooze->snooze_until = $snooze->snooze_until->addMinutes((self::isNightTime() ? $template->min_snooze_nighttime : $template->min_snooze_daytime) ?? 1);
                 }
             }
@@ -52,7 +57,6 @@ class NotifySnoozeService
 
         $snooze = NotifySnooze::newModelInstance([
             'overlap' => $overlap,
-            'event' => $event,
             'sent_at' => null,
             'snooze_until' => now()->addMinutes($until),
             'receiver' => is_array($receiver) ? $receiver : [$receiver],
@@ -64,15 +68,20 @@ class NotifySnoozeService
             if (self::isNightTime()) {
                 if ($template->min_snooze_nighttime === -1) {
                     if (now()->lt(Carbon::createFromTimeString(self::END_NIGHT_TIME))) {
+                        NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze today');
                         $minuteUntilMorning = now()->diffInMinutes(Carbon::createFromTimeString(self::END_NIGHT_TIME));
                     } else {
+                        NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze tomorrow');
                         $minuteUntilMorning = 24 * 60 - now()->diffInMinutes(Carbon::createFromTimeString(self::END_NIGHT_TIME));
                     }
+                    NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze until morning plus: ' . $minuteUntilMorning . ' minutes');
                     $snooze->snooze_until = now()->addMinutes($minuteUntilMorning);
                 } else {
+                    NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze nighttime plus: ' . ($template->min_snooze_nighttime ?? 1) . ' minutes');
                     $snooze->snooze_until = now()->addMinutes($template->min_snooze_nighttime ?? 1);
                 }
             } else {
+                NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze daytime plus: ' . ($template->min_snooze_daytime ?? 1) . ' minutes');
                 $snooze->snooze_until = now()->addMinutes($template->min_snooze_daytime ?? 1);
             }
         } else {
@@ -85,31 +94,31 @@ class NotifySnoozeService
 
     /**
      * @param $overlap
-     * @param string $event
      * @param Model|int|string $template content to send
      * @param array<int>|int $receiver user_ids
      * @param array<Notification> $channels
      * @return NotifySnooze
      */
-    public function sendNow($overlap, string $event, $template, $receiver, array $channels = []): NotifySnooze
+    public function sendNow($overlap, $template, $receiver = [], array $channels = []): NotifySnooze
     {
         $snooze = NotifySnooze::newModelInstance([
             'overlap' => $overlap,
-            'event' => $event,
             'sent_at' => null,
             'snooze_until' => now(),
             'receiver' => is_array($receiver) ? $receiver : [$receiver],
-            'content' => is_string($template) ? $template : null
+            'content' => is_string($template) ? $template : null,
+            'notify_snooze_template_id' => is_numeric($template) ? $template : null
         ]);
 
         if ($template instanceof Model) {
             $snooze->template()->associate($template);
-        } else {
+        } else if (!$snooze->notify_snooze_template_id) {
             $snooze->channels = $channels;
         }
 
         $snooze->save();
-        Artisan::call('snooze:notify', ['id' => $snooze->id]);
+        NotifySnoozeService::debug('[NotifySnooze #'.$snooze->id.'] Snooze now');
+        Artisan::call('notify:snooze', ['id' => $snooze->id]);
 
         return $snooze;
     }

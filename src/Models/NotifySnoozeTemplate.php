@@ -33,6 +33,10 @@ class NotifySnoozeTemplate extends Model
         'type',
         'channels',
         'context',
+        'min_snooze_daytime',
+        'max_snooze_daytime',
+        'min_snooze_nighttime',
+        'max_snooze_nighttime',
     ];
     protected $casts = [
         'channels' => 'array',
@@ -47,6 +51,6 @@ class NotifySnoozeTemplate extends Model
 
     public function notify()
     {
-        return $this->hasMany(NotifySnooze::class);
+        return $this->hasMany(NotifySnooze::class, 'notify_snooze_template_id');
     }
 }

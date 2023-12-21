@@ -11,7 +11,6 @@ class CreateNotifySnoozesTable extends Migration
         Schema::connection(config('snooze.connection'))->create('notify_snoozes', function (Blueprint $table) {
             $table->id();
             $table->string('overlap');
-            $table->string('event');
             $table->dateTime('snooze_until')->nullable();
             $table->dateTime('sent_at')->nullable();
             $table->json('receiver')->nullable();
@@ -21,7 +20,6 @@ class CreateNotifySnoozesTable extends Migration
             $table->timestamps();
 
             $table->index('overlap');
-            $table->index('event');
             $table->index('snooze_until');
             $table->index('sent_at');
             $table->index('notify_snooze_template_id');

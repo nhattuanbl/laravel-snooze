@@ -39,7 +39,6 @@ php artisan schedule:work
 | Snooze::send( |                              |                                                |                                  | 
 |---------------|------------------------------|------------------------------------------------|----------------------------------|
 | $overlap      | string\|Model                | Unique key of the notification avoid duplicate | App\Models\Comment::first()      |
-| $event        | string                       | Type of event                                  | "COMMENT"                        |
 | $template     | string\|NotifySnoozeTemplate | Text or NotifySnoozeTemplate Model             | "Someone comment on your post"   |
 | $receiver     | array<int>\|int              | Users who will receive the notification        | App\Models\User::first()         |
 | $channels     | array<Notification>          | Notification class handling                    | App\Notification\BillMail::class |
@@ -52,13 +51,13 @@ Send notification immediately
 ```
 
 ### Create template
-| NotifySnoozeTemplate::create([ |        |        | default                  | 
-|--------------------------------|--------|--------|--------------------------|
-| type                           | string | unique |                          |
-| channels                       | array  |        |                          |
-| context                        | string |        |                          |
-| min_snooze_daytime             | int    |        | 1                        |
-| max_snooze_daytime             | int    |        | 5                        |
-| min_snooze_nighttime           | int    |        | -1 //wait until morning  |
-| max_snooze_nighttime           | int    |        | 5                        |
-| ]);                            |        |        |                          | 
+| NotifySnoozeTemplate::create([ |        |        | default                 | 
+|--------------------------------|--------|--------|-------------------------|
+| type                           | string | unique |                         |
+| channels                       | array  |        | null                    |
+| context                        | string |        |                         |
+| min_snooze_daytime             | int    |        | 1                       |
+| max_snooze_daytime             | int    |        | 5                       |
+| min_snooze_nighttime           | int    |        | -1 //wait until morning |
+| max_snooze_nighttime           | int    |        | 5                       |
+| ]);                            |        |        |                         | 
